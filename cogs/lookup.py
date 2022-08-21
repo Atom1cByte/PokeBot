@@ -1,9 +1,32 @@
+import difflib
 import discord
 import requests
-import difflib
-from discord.ui import View
 from discord.commands import Option
 from discord.ext import commands
+from discord.ui import View
+
+class FoundView(View):
+    def __init__(self):
+        super().__init__()
+
+    @discord.ui.select(
+        min_values=1,
+        placeholder="Chose what info you want to show",
+        options=[
+            discord.SelectOption(
+                label="Color",
+                emoji="🏳️‍🌈",
+                description="Shows the color of the pokémon"
+            ),
+            discord.SelectOption(
+                label="Evolution Chain",
+                emoji="⛓️",
+                description="Shows the evolution chain of the selected pokémon"
+            ),
+        ],
+    )
+    async def select_callback(self, select, interaction):
+        pass
 
 class NotFoundView(View):
     def __init__(self, pokemon):
@@ -19,6 +42,7 @@ class NotFoundView(View):
         await interaction.response.edit_message("> Aww. Sorry I couldn't find your pokémon. To be honest it most likely doesn't exist")
 
 async def poke_interaction(pokemon, inter: discord.Interaction):
+    resp = requests.get(f"https://pokeapi.co/api/v2/pokemon-species/{pokemon}")
     try:
         await inter.response.edit_message(content="....", view=View())
     except:
